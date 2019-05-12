@@ -26,6 +26,8 @@ import torch.distributed as dist
 import torch.utils.data.distributed
 
 # misc
+import sys
+sys.path.append('/root/densecap')
 from data.anet_dataset import ANetDataset, anet_collate_fn, get_vocab_and_sentences
 from model.action_prop_dense_cap import ActionPropDenseCap
 from data.utils import update_values
@@ -48,7 +50,7 @@ parser.add_argument('--load_valid_samplelist', action='store_true')
 parser.add_argument('--valid_samplelist_path', type=str, default='/z/home/luozhou/subsystem/densecap_vid/valid_samplelist.pkl')
 parser.add_argument('--start_from', default='', help='path to a model checkpoint to initialize model weights from. Empty = dont')
 parser.add_argument('--max_sentence_len', default=20, type=int)
-parser.add_argument('--num_workers', default=1, type=int)
+parser.add_argument('--num_workers', default=0, type=int)
 
 # Model settings: General
 parser.add_argument('--d_model', default=512, type=int, help='size of the rnn in number of hidden nodes in each layer')

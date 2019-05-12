@@ -136,21 +136,27 @@ class ANetDataset(Dataset):
             neg_anchor_stats = []
             # load annotation per video and construct training set
             missing_prop = 0
-            with multiprocessing.Pool(multiprocessing.cpu_count()) as pool:
-                results = [None]*len(raw_data)
-                vid_idx = 0
-                for vid, val in raw_data.items():
-                    annotations = val['annotations']
-                    for split_path in split_paths:
-                        if val['subset'] in split and os.path.isfile(os.path.join(split_path, vid + '_bn.npy')):
-                            results[vid_idx] = pool.apply_async(_get_pos_neg,
-                                         (split_path, annotations, vid,
-                                          slide_window_size, frame_to_second[vid], anc_len_all,
-                                          anc_cen_all, pos_thresh, neg_thresh))
-                            vid_idx += 1
-                results = results[:vid_idx]
-                for i, r in enumerate(results):
-                    results[i] = r.get()
+            #with multiprocessing.Pool(multiprocessing.cpu_count()) as pool:
+            results = [None]*len(raw_data)
+            vid_idx = 0
+            for vid, val in raw_data.items():
+                annotations = val['annotations']
+                for split_path in split_paths:
+                    if val['subset'] in split and os.path.isfile(os.path.join(split_path, vid + '_bn.npy')):
+                        '''
+                        results[vid_idx] = pool.apply_async(_get_pos_neg,
+                                     (split_path, annotations, vid,
+                                      slide_window_size, frame_to_second[vid], anc_len_all,
+                                      anc_cen_all, pos_thresh, neg_thresh))
+                        '''
+                        results[vid_idx] = _get_pos_neg(split_path, annotations, vid,
+                                      slide_window_size, frame_to_second[vid], anc_len_all,
+                                      anc_cen_all, pos_thresh, neg_thresh)
+                        
+                        vid_idx += 1
+            results = results[:vid_idx]
+            for i, r in enumerate(results):
+                results[i] = r.get()
 
             vid_counter = 0
             for r in results:
